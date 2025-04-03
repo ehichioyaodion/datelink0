@@ -14,17 +14,20 @@ const WelcomeScreen = () => {
 
     const checkAuthAndNavigate = async () => {
       try {
+        console.log('Starting auth check...'); // Debug log
+        
         // Add timeout handling
         const loginPromise = attemptAutoLogin();
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Login timeout')), 5000)
         );
 
-        // Wait for animation to complete (minimum 2 seconds instead of 3)
+        // Wait for animation
         await new Promise((resolve) => setTimeout(resolve, 2000));
         
         // Race between login attempt and timeout
         const isAutoLoginSuccessful = await Promise.race([loginPromise, timeoutPromise]);
+        console.log('Auth check result:', isAutoLoginSuccessful); // Debug log
 
         if (isAutoLoginSuccessful) {
           navigation.reset({
@@ -39,7 +42,7 @@ const WelcomeScreen = () => {
         }
       } catch (error) {
         console.error('Auto login check failed:', error);
-        // Ensure navigation happens even on error
+        // Navigate to Onboarding on error
         navigation.reset({
           index: 0,
           routes: [{ name: 'Onboarding' }],
@@ -48,21 +51,22 @@ const WelcomeScreen = () => {
     };
 
     checkAuthAndNavigate();
-  }, []);
+  }, [navigation, attemptAutoLogin, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
   return (
-    <View className="flex-1 items-center justify-center bg-colorBlue">
+    <View className="flex-1 items-center justify-center bg-primary">
       <Animated.View style={animatedStyle}>
         <View className="items-center">
-          <Image source={require('../assets/icon.png')} className="h-32 w-32" />
+          <Image 
+            source={require('../assets/icon.png')} 
+            className="h-32 w-32" 
+            resizeMode="contain"
+          />
           <Text className="mt-4 text-3xl font-bold text-white">DateLink</Text>
-          <Text className="mt-2 text-center text-white">
-            Connecting people, one match at a time
-          </Text>
           <ActivityIndicator size="large" color="#ffffff" className="mt-4" />
         </View>
       </Animated.View>

@@ -4,8 +4,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
-  updateProfile
+  signOut
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,31 +17,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const attemptAutoLogin = async () => {
-    try {
-      // Add console logs for debugging
-      console.log('Attempting auto login...');
-      
-      // Check for stored credentials or token
-      const storedUser = await AsyncStorage.getItem('user');
-      
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        console.log('Auto login successful');
-        return true;
-      }
-      
-      console.log('No stored credentials found');
-      return false;
-    } catch (error) {
-      console.error('Auto login error:', error);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Store user session
   const storeUserSession = async (user, token) => {
@@ -139,6 +113,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const attemptAutoLogin = async () => {
+    try {
+      console.log('Attempting auto login...');
+      const storedUser = await AsyncStorage.getItem('@user_session');
+      
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        console.log('Auto login successful');
+        return true;
+      }
+      
+      console.log('No stored credentials found');
+      return false;
+    } catch (error) {
+      console.error('Auto login error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Check authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (user) => {
@@ -170,6 +166,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUserSuperLikes,
+    attemptAutoLogin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
