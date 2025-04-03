@@ -1,38 +1,60 @@
 {
   "expo": {
-    "name": "datelink",
+    "name": "DateLink",
     "slug": "datelink",
     "version": "1.0.0",
-
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-
-    "experiments": {
-      "tsconfigPaths": true
-    },
-
-    "plugins": [],
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.datelink"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.yourcompany.datelink",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow DateLink to use your location to show you people nearby.",
+          "locationWhenInUsePermission": "Allow DateLink to use your location to show you people nearby."
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5874512508124326~1352470498",
+          "iosAppId": "ca-app-pub-5874512508124326~4678413937",
+          "delay": 3000,
+          "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
+        }
+      ],
+
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "599735c1-9efe-4e6b-8e42-8cb40c960050"
       }
     }
   }
 }
+
+
+
