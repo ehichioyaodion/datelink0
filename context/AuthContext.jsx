@@ -19,6 +19,31 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const attemptAutoLogin = async () => {
+    try {
+      // Add console logs for debugging
+      console.log('Attempting auto login...');
+      
+      // Check for stored credentials or token
+      const storedUser = await AsyncStorage.getItem('user');
+      
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        console.log('Auto login successful');
+        return true;
+      }
+      
+      console.log('No stored credentials found');
+      return false;
+    } catch (error) {
+      console.error('Auto login error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Store user session
   const storeUserSession = async (user, token) => {
     try {
@@ -157,3 +182,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

@@ -25,6 +25,9 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   const { user, loading } = useAuth();
 
+  // Add console log for debugging
+  console.log('AppNavigator state:', { user, loading });
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">

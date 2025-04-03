@@ -14,27 +14,32 @@ const WelcomeScreen = () => {
 
     const checkAuthAndNavigate = async () => {
       try {
-        // Wait for animation to complete (minimum 3 seconds)
-        await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait for animation to complete (minimum 3 seconds)
-        // Check if user has a valid session
-        const isAutoLoginSuccessful = await attemptAutoLogin();
+        // Add timeout handling
+        const loginPromise = attemptAutoLogin();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Login timeout')), 5000)
+        );
+
+        // Wait for animation to complete (minimum 2 seconds instead of 3)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        
+        // Race between login attempt and timeout
+        const isAutoLoginSuccessful = await Promise.race([loginPromise, timeoutPromise]);
 
         if (isAutoLoginSuccessful) {
-          // User has valid session, navigate to TabNavigator
           navigation.reset({
             index: 0,
             routes: [{ name: 'TabNavigator' }],
           });
         } else {
-          // No valid session, navigate to Onboarding
           navigation.reset({
             index: 0,
             routes: [{ name: 'Onboarding' }],
           });
         }
       } catch (error) {
-        // console.error('Auto login check failed:', error);
-        // On error, navigate to Onboarding
+        console.error('Auto login check failed:', error);
+        // Ensure navigation happens even on error
         navigation.reset({
           index: 0,
           routes: [{ name: 'Onboarding' }],
