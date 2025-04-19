@@ -59,31 +59,50 @@ export const AuthProvider = ({ children }) => {
   // Register with email/password
   const register = async (email, password, userData) => {
     try {
-      console.log('Attempting registration with:', email); // Add this log
+      console.log('Starting registration in AuthContext...'); 
       setError(null);
-      const response = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
-      console.log('Registration response:', response); // Add this log
       
+      // Create the user in Firebase Auth
+      const response = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      console.log('User created in Firebase Auth:', response.user.uid);
+      
+      // Get the token
       const token = await response.user.getIdToken();
+      
+      // Store user session
       await storeUserSession(response.user, token);
       
-      await setDoc(doc(FIREBASE_DB, USERS_REF, response.user.uid), {
-        ...userData,
+      // Create user document reference
+      const userRef = doc(FIREBASE_DB, USERS_REF, response.user.uid);
+      
+      // Prepare minimal user data for Firestore
+      const userDocData = {
+        uid: response.user.uid,
+        email: email.toLowerCase(),
+        displayName: userData.displayName,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        photoURL: null,
         profileCompleted: false,
         superLikesRemaining: SUPER_LIKES_DAILY_LIMIT,
         lastSuperLikeDate: null,
         receivedSuperLikes: [],
-      });
+      };
 
+      // Create the user document in Firestore
+      await setDoc(userRef, userDocData);
+      
+      console.log('User document created in Firestore:', response.user.uid);
+
+      // Update local user state
       setUser({ 
         ...response.user, 
-        ...userData, 
-        profileCompleted: false,
-        superLikesRemaining: SUPER_LIKES_DAILY_LIMIT,
+        ...userDocData
       });
+      
+      return response.user;
     } catch (error) {
-      console.error('Registration error:', error); // Add this log
+      console.error('Registration error in AuthContext:', error);
       setError(error.message);
       throw error;
     }
@@ -179,4 +198,9 @@ export const useAuth = () => {
   }
   return context;
 };
+
+
+
+
+
 

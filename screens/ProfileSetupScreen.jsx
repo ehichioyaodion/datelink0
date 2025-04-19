@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon, CameraIcon } from 'react-native-heroicons/solid';
@@ -16,6 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { FIREBASE_DB, FIREBASE_STORAGE } from '../FirebaseConfig';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const ProfileSetupScreen = () => {
   const navigation = useNavigation();
@@ -29,6 +31,8 @@ const ProfileSetupScreen = () => {
     location: '',
     interests: [],
   });
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const interests = [
     'Music',
@@ -80,10 +84,10 @@ const ProfileSetupScreen = () => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets[0].uri) {
@@ -108,9 +112,35 @@ const ProfileSetupScreen = () => {
     }
   };
 
+  // Calculate age from date of birth
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Handle date change
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDateOfBirth(selectedDate);
+      const age = calculateAge(selectedDate);
+      handleChange('age', age.toString());
+    }
+  };
+
+  // Show date picker
+  const showDatePickerModal = () => {
+    setShowDatePicker(true);
+  };
+
   const validateProfile = () => {
     if (!profileImage) {
-      Alert.alert('Error', 'Please select a profile photo');
+      Alert.alert('Error', 'Please Select a Profile Photo');
       return false;
     }
 
@@ -119,14 +149,14 @@ const ProfileSetupScreen = () => {
       return false;
     }
 
-    if (!profileData.age) {
-      Alert.alert('Error', 'Please enter your age');
+    const age = calculateAge(dateOfBirth);
+    if (age < 18) {
+      Alert.alert('Error', 'You must be at least 18 years old to use this app');
       return false;
     }
 
-    const age = parseInt(profileData.age);
-    if (isNaN(age) || age < 18 || age > 100) {
-      Alert.alert('Error', 'Please enter a valid age between 18 and 100');
+    if (age > 100) {
+      Alert.alert('Error', 'Please enter a valid date of birth');
       return false;
     }
 
@@ -184,6 +214,50 @@ const ProfileSetupScreen = () => {
     }
   };
 
+  const renderDatePicker = () => {
+    if (Platform.OS === 'ios') {
+      return (
+        <View>
+          <Text className="mb-2 text-base text-gray-700">Date of Birth</Text>
+          <DateTimePicker
+            value={dateOfBirth}
+            mode="date"
+            display="spinner"
+            onChange={onDateChange}
+            maximumDate={new Date()}
+            minimumDate={new Date(1923, 0, 1)}
+          />
+          <Text className="mt-1 text-right text-gray-500">
+            Age: {calculateAge(dateOfBirth)}
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <View>
+        <Text className="mb-2 text-base text-gray-700">Date of Birth</Text>
+        <TouchableOpacity
+          onPress={showDatePickerModal}
+          className="rounded-xl bg-gray-100 p-4">
+          <Text className="text-gray-900">
+            {dateOfBirth.toLocaleDateString()} (Age: {calculateAge(dateOfBirth)})
+          </Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={dateOfBirth}
+            mode="date"
+            display="default"
+            onChange={onDateChange}
+            maximumDate={new Date()}
+            minimumDate={new Date(1923, 0, 1)}
+          />
+        )}
+      </View>
+    );
+  };
+
   return (
     <View className="flex-1 bg-white">
       <View className="p-4">
@@ -227,17 +301,7 @@ const ProfileSetupScreen = () => {
             <Text className="mt-1 text-right text-gray-500">{profileData.bio.length}/200</Text>
           </View>
 
-          <View>
-            <Text className="mb-2 text-base text-gray-700">Age</Text>
-            <TextInput
-              className="rounded-xl bg-gray-100 p-4 text-gray-900"
-              placeholder="Your age"
-              value={profileData.age}
-              onChangeText={(value) => handleChange('age', value)}
-              keyboardType="numeric"
-              maxLength={2}
-            />
-          </View>
+          {renderDatePicker()}
 
           <View>
             <Text className="mb-2 text-base text-gray-700">Gender</Text>

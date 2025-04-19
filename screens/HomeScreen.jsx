@@ -10,9 +10,9 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useToast } from '../components/Notification';
+import { useNotification } from '../hooks/useNotification';
 import { useAuth } from '../context/AuthContext';
-import { FIREBASE_DB, SUPER_LIKES_REF, USERS_REF, PROFILES_REF } from '../FirebaseConfig';
+import { FIREBASE_DB, USERS_REF, PROFILES_REF, SUPER_LIKES_REF } from '../FirebaseConfig';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { width, height, SUPER_LIKES_DAILY_LIMIT } from '../constants/dimensions';
 const SWIPE_THRESHOLD = width * 0.3;
@@ -24,7 +24,7 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [superLikesRemaining, setSuperLikesRemaining] = useState(SUPER_LIKES_DAILY_LIMIT);
   const [lastSuperLikeDate, setLastSuperLikeDate] = useState(null);
-  const { showToast } = useToast();
+  const { showSuccess, showError, showWarning } = useNotification();
   const navigation = useNavigation();
 
   const translateX = useSharedValue(0);
@@ -171,7 +171,7 @@ const HomeScreen = () => {
       setCurrentIndex(0);
     } catch (error) {
       console.error('Error fetching profiles:', error);
-      showToast('Failed to load profiles', 'error');
+      showError('Failed to load profiles');
     } finally {
       setLoading(false);
     }
@@ -212,12 +212,12 @@ const HomeScreen = () => {
         }
       } catch (error) {
         console.error('Error loading super like data:', error);
-        showToast('Failed to load Super Like data', 'error');
+        showError('Failed to load Super Like data');
       }
     };
 
     loadSuperLikeData();
-  }, [user.uid, showToast]);
+  }, [user.uid, showError]);
 
   const checkAndResetSuperLikes = useCallback(async () => {
     const now = new Date();
@@ -237,7 +237,7 @@ const HomeScreen = () => {
       const wasReset = await checkAndResetSuperLikes();
 
       if (!wasReset && superLikesRemaining <= 0) {
-        showToast('No Super Likes remaining today!', 'warning');
+        showWarning('No Super Likes remaining today!');
         return;
       }
 
@@ -277,12 +277,12 @@ const HomeScreen = () => {
         }
       });
 
-      showToast(`Super Liked ${currentProfile.name}!`, 'success');
+      showSuccess(`Super Liked ${currentProfile.name}!`);
     } catch (error) {
       console.error('Super Like error:', error);
-      showToast('Failed to Super Like. Please try again.', 'error');
+      showError('Failed to Super Like. Please try again.');
     }
-  }, [currentIndex, superLikesRemaining, checkAndResetSuperLikes, user.uid, showToast]);
+  }, [currentIndex, superLikesRemaining, checkAndResetSuperLikes, user.uid, showSuccess, showError]);
 
   // Show loading state
   if (loading) {
@@ -412,3 +412,5 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
+

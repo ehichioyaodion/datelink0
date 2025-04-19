@@ -11,6 +11,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
@@ -19,21 +20,6 @@ import { useNotification } from '../hooks/useNotification';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
-
-  // Handle hardware back button
-  useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        navigation.popToTop();
-        return true;
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation])
-  );
-
   const { register } = useAuth();
   const { showSuccess, showError } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -49,7 +35,7 @@ const RegisterScreen = () => {
   };
 
   const validateForm = () => {
-    // Check for empty fields
+    // Basic validation
     if (!formData.fullName.trim()) {
       showError('Please enter your full name');
       return false;
@@ -60,32 +46,18 @@ const RegisterScreen = () => {
       return false;
     }
 
-    if (!formData.password || !formData.confirmPassword) {
-      showError('Please fill in both password fields');
-      return false;
-    }
-
-    // Validate email format
+    // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       showError('Please enter a valid email address');
       return false;
     }
 
-    // Validate password
-    if (formData.password.length < 6) {
+    if (!formData.password || formData.password.length < 6) {
       showError('Password must be at least 6 characters long');
       return false;
     }
 
-    // Check password strength
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    if (!passwordRegex.test(formData.password)) {
-      showError('Password must contain both letters and numbers');
-      return false;
-    }
-
-    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       showError('Passwords do not match');
       return false;
@@ -99,29 +71,34 @@ const RegisterScreen = () => {
 
     try {
       setLoading(true);
+      console.log('Starting registration process...');
+
       const userData = {
         displayName: formData.fullName,
-        email: formData.email,
-        createdAt: new Date().toISOString(),
-        photoURL: null,
-        bio: '',
-        location: '',
-        interests: [],
-        profileCompleted: false,
+        email: formData.email.toLowerCase().trim(),
       };
 
-      await register(formData.email, formData.password, userData);
+      console.log('Attempting registration with:', { email: userData.email });
+
+      const registeredUser = await register(
+        formData.email.toLowerCase().trim(), 
+        formData.password, 
+        userData
+      );
+      
+      console.log('Registration successful, user ID:', registeredUser.uid);
       showSuccess('Account created successfully!');
 
-      // Navigate to profile setup
+      // Simply navigate to main screen
       navigation.reset({
         index: 0,
-        routes: [{ name: 'ProfileSetup' }],
+        routes: [{ name: 'Main' }],
       });
-    } catch (error) {
-      // Handle specific error cases
-      let errorMessage = 'An unexpected error occurred';
 
+    } catch (error) {
+      console.error('Registration error:', error);
+      
+      let errorMessage = 'An unexpected error occurred';
       switch (error.code) {
         case 'auth/email-already-in-use':
           errorMessage = 'This email is already registered';
@@ -141,7 +118,6 @@ const RegisterScreen = () => {
         default:
           errorMessage = error.message || 'Failed to create account. Please try again';
       }
-
       showError(errorMessage);
     } finally {
       setLoading(false);
@@ -159,19 +135,13 @@ const RegisterScreen = () => {
           bounces={false}
           showsVerticalScrollIndicator={false}
         >
-          <View className="p-4">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <ArrowLeftIcon size={20} color="#374151" />
-            </TouchableOpacity>
-          </View>
-
+          {/* Form Fields */}
           <View className="px-4 pt-8">
             <Text className="text-center text-3xl font-bold text-gray-900">Create Account</Text>
             <Text className="mt-2 text-center text-lg text-gray-600">Join our community</Text>
 
             <View className="mt-8 space-y-4">
+              {/* Full Name Input */}
               <View>
                 <Text className="mb-2 text-base text-gray-700">Full Name</Text>
                 <TextInput
@@ -179,11 +149,13 @@ const RegisterScreen = () => {
                   placeholder="Enter your full name"
                   value={formData.fullName}
                   onChangeText={(value) => handleChange('fullName', value)}
+                  autoCapitalize="words"
                   autoComplete="name"
                   textContentType="name"
                 />
               </View>
 
+              {/* Email Input */}
               <View>
                 <Text className="mb-2 text-base text-gray-700">Email</Text>
                 <TextInput
@@ -198,6 +170,7 @@ const RegisterScreen = () => {
                 />
               </View>
 
+              {/* Password Input */}
               <View>
                 <Text className="mb-2 text-base text-gray-700">Password</Text>
                 <TextInput
@@ -211,6 +184,7 @@ const RegisterScreen = () => {
                 />
               </View>
 
+              {/* Confirm Password Input */}
               <View>
                 <Text className="mb-2 text-base text-gray-700">Confirm Password</Text>
                 <TextInput
@@ -225,6 +199,7 @@ const RegisterScreen = () => {
               </View>
             </View>
 
+            {/* Register Button */}
             <View className="mb-4 mt-8">
               <TouchableOpacity
                 className={`rounded-full ${loading ? 'bg-gray-400' : 'bg-colorBlue'} py-4`}
@@ -233,11 +208,14 @@ const RegisterScreen = () => {
                 {loading ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <Text className="text-center text-lg font-semibold text-white">Create Account</Text>
+                  <Text className="text-center text-lg font-semibold text-white">
+                    Create Account
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
 
+            {/* Login Link */}
             <View className="mb-8 mt-6 flex-row justify-center">
               <Text className="text-gray-600">Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>

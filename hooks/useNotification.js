@@ -1,30 +1,23 @@
-import { useToast } from 'react-native-toast-notifications';
+import { useToast } from '../components/Notification';
 
 export const useNotification = () => {
-  const toast = useToast();
+  const { showToast } = useToast();
 
   const showSuccess = (message) => {
-    toast.show(message, {
-      type: 'success',
-      placement: 'top',
-      duration: 4000,
-      offset: 30,
-      animationType: 'slide-in',
-    });
+    showToast(message, 'success');
   };
 
   const showError = (message) => {
-    toast.show(message, {
-      type: 'danger',
-      placement: 'top',
-      duration: 4000,
-      offset: 30,
-      animationType: 'slide-in',
-    });
+    showToast(message, 'error');
+  };
+
+  const showWarning = (message) => {
+    showToast(message, 'warning');
   };
 
   return {
     showSuccess,
     showError,
+    showWarning
   };
 };

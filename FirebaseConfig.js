@@ -6,7 +6,6 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCNu00A9zk8Ocl95TZw5InzK9IYprENve0",
   authDomain: "app-datelink.firebaseapp.com",
@@ -23,3 +22,10 @@ export const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 export const FIREBASE_DB = getFirestore(FIREBASE_APP);
 export const FIREBASE_ANALYTICS = getAnalytics(FIREBASE_APP);
 export const FIREBASE_STORAGE = getStorage(FIREBASE_APP);
+
+// Collection References
+export const USERS_REF = 'users';
+export const MATCHES_REF = 'matches';
+export const PROFILES_REF = 'profiles';
+export const SUPER_LIKES_REF = 'superLikes';
+export const NOTIFICATIONS_REF = 'notifications';
