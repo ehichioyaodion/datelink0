@@ -154,6 +154,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserProfile = async (updatedUserData) => {
+    try {
+      setUser(updatedUserData);
+      return true;
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
+  };
+
   // Check authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (user) => {
@@ -184,6 +194,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUserProfile,
     updateUserSuperLikes,
     attemptAutoLogin,
   };
@@ -198,6 +209,7 @@ export const useAuth = () => {
   }
   return context;
 };
+
 
 
 

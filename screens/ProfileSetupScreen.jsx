@@ -30,6 +30,7 @@ const ProfileSetupScreen = () => {
     gender: '',
     location: '',
     interests: [],
+    dateOfBirth: new Date().toISOString(),
   });
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -139,11 +140,6 @@ const ProfileSetupScreen = () => {
   };
 
   const validateProfile = () => {
-    if (!profileImage) {
-      Alert.alert('Error', 'Please Select a Profile Photo');
-      return false;
-    }
-
     if (!profileData.bio.trim()) {
       Alert.alert('Error', 'Please write a short bio');
       return false;
@@ -183,19 +179,31 @@ const ProfileSetupScreen = () => {
 
     try {
       setLoading(true);
-      const photoURL = await uploadImage(profileImage);
+      console.log('Starting profile setup...'); // Debug log
+
+      let photoURL = null;
+      if (profileImage) {
+        console.log('Uploading image...'); // Debug log
+        photoURL = await uploadImage(profileImage);
+        console.log('Image uploaded successfully:', photoURL); // Debug log
+      }
 
       const updatedData = {
         ...profileData,
-        age: parseInt(profileData.age),
+        dateOfBirth: dateOfBirth.toISOString(),
+        age: calculateAge(dateOfBirth),
         photoURL,
         profileCompleted: true,
         updatedAt: new Date().toISOString(),
       };
 
+      console.log('Updating Firestore with data:', updatedData); // Debug log
+
       // Update Firestore
       const userRef = doc(FIREBASE_DB, 'users', user.uid);
       await updateDoc(userRef, updatedData);
+
+      console.log('Firestore updated successfully'); // Debug log
 
       // Update Auth Context
       await updateUserProfile({
@@ -203,12 +211,18 @@ const ProfileSetupScreen = () => {
         ...updatedData,
       });
 
+      console.log('Auth context updated successfully'); // Debug log
+
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Main' }],
+        routes: [{ name: 'TabNavigator' }],
       });
     } catch (error) {
-      Alert.alert('Error', 'Failed to complete profile setup');
+      console.error('Profile setup error:', error); // Detailed error logging
+      Alert.alert(
+        'Error',
+        'Failed to complete profile setup: ' + (error.message || 'Unknown error')
+      );
     } finally {
       setLoading(false);
     }
