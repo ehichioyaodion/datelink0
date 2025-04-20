@@ -1,6 +1,6 @@
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { View, Text } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   HomeIcon,
   UserIcon,
@@ -16,18 +16,18 @@ import {
   HeartIcon as HeartIconSolid,
 } from 'react-native-heroicons/solid';
 
-import HomeScreen from '../screens/HomeScreen';
 import ChatListScreen from '../screens/ChatListScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import PeopleNearbyScreen from '../screens/PeopleNearbyScreen';
+import HomeScreen from '../screens/HomeScreen';
 import MatchesScreen from '../screens/MatchesScreen';
+import PeopleNearbyScreen from '../screens/PeopleNearbyScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   // You should replace these with actual data from your state management system
   const unreadMessages = 5; // Get this from your chat context/state
-  const recentMatches = 2;  // Get this from your matches context/state
+  const recentMatches = 2; // Get this from your matches context/state
 
   const TabBarIcon = ({ focused, color, icon: Icon, solidIcon: SolidIcon }) => {
     const IconComponent = focused ? SolidIcon : Icon;
@@ -55,12 +55,7 @@ const TabNavigator = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon
-              focused={focused}
-              color={color}
-              icon={HomeIcon}
-              solidIcon={HomeIconSolid}
-            />
+            <TabBarIcon focused={focused} color={color} icon={HomeIcon} solidIcon={HomeIconSolid} />
           ),
         }}
       />
@@ -92,10 +87,8 @@ const TabNavigator = () => {
                 solidIcon={HeartIconSolid}
               />
               {recentMatches > 0 && (
-                <View className="absolute -right-3 -top-2 h-5 min-w-[20px] rounded-full bg-red-500 items-center justify-center px-1">
-                  <Text className="text-xs font-bold text-white">
-                    {recentMatches}
-                  </Text>
+                <View className="absolute -right-3 -top-1 h-4 w-4 items-center justify-center rounded-full bg-red-500 text-center">
+                  <Text className="text-xs font-bold text-white">{recentMatches}</Text>
                 </View>
               )}
             </View>
@@ -116,10 +109,8 @@ const TabNavigator = () => {
                 solidIcon={ChatBubbleLeftRightIconSolid}
               />
               {unreadMessages > 0 && (
-                <View className="absolute -right-3 -top-2 h-5 min-w-[20px] rounded-full bg-red-500 items-center justify-center px-1">
-                  <Text className="text-xs font-bold text-white">
-                    {unreadMessages}
-                  </Text>
+                <View className="absolute -right-3 -top-1 h-4 w-4 items-center justify-center rounded-full bg-red-500 text-center">
+                  <Text className="text-xs font-bold text-white">{unreadMessages}</Text>
                 </View>
               )}
             </View>
@@ -131,12 +122,7 @@ const TabNavigator = () => {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon
-              focused={focused}
-              color={color}
-              icon={UserIcon}
-              solidIcon={UserIconSolid}
-            />
+            <TabBarIcon focused={focused} color={color} icon={UserIcon} solidIcon={UserIconSolid} />
           ),
         }}
       />

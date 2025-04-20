@@ -1,3 +1,4 @@
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -5,16 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  BackHandler,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { ArrowLeftIcon } from 'react-native-heroicons/solid';
+
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../hooks/useNotification';
 
@@ -46,15 +44,35 @@ const RegisterScreen = () => {
       return false;
     }
 
-    // Simple email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const trimmedEmail = formData.email.replace(/\s/g, '');
+    if (!emailRegex.test(trimmedEmail)) {
       showError('Please enter a valid email address');
       return false;
     }
 
-    if (!formData.password || formData.password.length < 6) {
-      showError('Password must be at least 6 characters long');
+    // Password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+    
+    if (!formData.password) {
+      showError('Password is required');
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      showError('Password must be at least 8 characters long');
+      return false;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      let errorMessage = 'Password must contain:';
+      if (!/(?=.*[a-z])/.test(formData.password)) errorMessage += '\n- At least one lowercase letter';
+      if (!/(?=.*[A-Z])/.test(formData.password)) errorMessage += '\n- At least one uppercase letter';
+      if (!/(?=.*\d)/.test(formData.password)) errorMessage += '\n- At least one number';
+      if (!/(?=.*[!@#$%^&*(),.?":{}|<>])/.test(formData.password)) errorMessage += '\n- At least one special character';
+      
+      showError(errorMessage);
       return false;
     }
 
@@ -81,23 +99,23 @@ const RegisterScreen = () => {
       console.log('Attempting registration with:', { email: userData.email });
 
       const registeredUser = await register(
-        formData.email.toLowerCase().trim(), 
-        formData.password, 
+        formData.email.toLowerCase().trim(),
+        formData.password,
         userData
       );
-      
+
       console.log('Registration successful, user ID:', registeredUser.uid);
       showSuccess('Account created successfully!');
 
       // Simply navigate to main screen
+      // remind me number 1
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Main' }],
+        routes: [{ name: 'TabNavigator' }],
       });
-
     } catch (error) {
       console.error('Registration error:', error);
-      
+
       let errorMessage = 'An unexpected error occurred';
       switch (error.code) {
         case 'auth/email-already-in-use':
@@ -125,16 +143,11 @@ const RegisterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
-    >
+      className="flex-1 bg-white">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView 
-          className="flex-1"
-          bounces={false}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView className="flex-1" bounces={false} showsVerticalScrollIndicator={false}>
           {/* Form Fields */}
           <View className="px-4 pt-8">
             <Text className="text-center text-3xl font-bold text-gray-900">Create Account</Text>
@@ -162,11 +175,12 @@ const RegisterScreen = () => {
                   className="rounded-xl bg-gray-100 p-4 text-gray-900"
                   placeholder="Enter your email"
                   value={formData.email}
-                  onChangeText={(value) => handleChange('email', value)}
+                  onChangeText={(value) => handleChange('email', value.trim())}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
                   textContentType="emailAddress"
+                  spellCheck={false}
                 />
               </View>
 
@@ -175,13 +189,16 @@ const RegisterScreen = () => {
                 <Text className="mb-2 text-base text-gray-700">Password</Text>
                 <TextInput
                   className="rounded-xl bg-gray-100 p-4 text-gray-900"
-                  placeholder="Create a password"
+                  placeholder="Create a password (min. 8 characters)"
                   value={formData.password}
-                  onChangeText={(value) => handleChange('password', value)}
+                  onChangeText={(value) => handleChange('password', value.replace(/\s/g, ''))}
                   secureTextEntry
                   autoComplete="password-new"
                   textContentType="newPassword"
                 />
+                <Text className="mt-1 text-xs text-gray-500">
+                  Must contain uppercase, lowercase, number, and special character
+                </Text>
               </View>
 
               {/* Confirm Password Input */}
@@ -230,3 +247,5 @@ const RegisterScreen = () => {
 };
 
 export default RegisterScreen;
+
+

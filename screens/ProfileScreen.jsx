@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import {
   ArrowLeftIcon,
   CameraIcon,
@@ -11,6 +11,7 @@ import {
   ShieldCheckIcon,
   QuestionMarkCircleIcon,
 } from 'react-native-heroicons/solid';
+
 import { useAuth } from '../context/AuthContext';
 
 const ProfileScreen = () => {
@@ -147,10 +148,7 @@ const ProfileScreen = () => {
           ))}
         </View>
 
-        <TouchableOpacity 
-          className="mx-4 my-6 rounded-full bg-red-50 p-4"
-          onPress={handleLogout}
-        >
+        <TouchableOpacity className="mx-4 my-6 rounded-full bg-red-50 p-4" onPress={handleLogout}>
           <Text className="text-center text-lg font-semibold text-red-500">Log Out</Text>
         </TouchableOpacity>
       </ScrollView>

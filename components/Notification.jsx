@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
-import { CheckCircleIcon, XCircleIcon, ExclamationCircleIcon, XMarkIcon } from 'react-native-heroicons/solid';
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  ExclamationCircleIcon,
+  XMarkIcon,
+} from 'react-native-heroicons/solid';
 
 // Create Toast Context
 const ToastContext = createContext();
@@ -121,10 +126,9 @@ const NotificationComponent = ({ toast, onDismiss }) => {
         opacity: fadeAnim,
         transform: [{ translateY }],
       }}
-      className="absolute left-4 right-4 top-12 z-50 overflow-hidden rounded-lg shadow-lg"
-    >
+      className="absolute left-4 right-4 top-12 z-50 overflow-hidden rounded-lg shadow-lg">
       <View className={`flex-row items-center justify-between ${type.bgColor} p-4`}>
-        <View className="flex-row items-center flex-1">
+        <View className="flex-1 flex-row items-center">
           <Icon size={24} color="white" />
           <Text className="ml-3 flex-1 text-base font-medium text-white" numberOfLines={2}>
             {toast.message}

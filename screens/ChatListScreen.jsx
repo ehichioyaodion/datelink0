@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon, MagnifyingGlassIcon } from 'react-native-heroicons/solid';
 
 const DUMMY_CHATS = [

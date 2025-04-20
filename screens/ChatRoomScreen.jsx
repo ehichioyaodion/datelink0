@@ -1,3 +1,4 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -9,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   ArrowLeftIcon,
   PaperAirplaneIcon,

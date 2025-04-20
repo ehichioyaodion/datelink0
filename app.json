@@ -16,14 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.datelink"
+      "bundleIdentifier": "com.codespark.datelink"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourcompany.datelink",
+      "package": "com.codespark.datelink",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
@@ -45,8 +45,7 @@
           "delay": 3000,
           "userTrackingPermission": "This identifier will be used to deliver personalized ads to you."
         }
-      ],
-
+      ]
     ],
     "extra": {
       "eas": {

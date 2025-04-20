@@ -1,3 +1,7 @@
+import { useNavigation } from '@react-navigation/native';
+import * as Contacts from 'expo-contacts';
+import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import React, { useState, useRef } from 'react';
 import {
   View,
@@ -10,12 +14,7 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
-import * as Contacts from 'expo-contacts';
 
-const { width } = Dimensions.get('window');
 
 const slides = [
   {
@@ -43,6 +42,7 @@ const OnboardingScreen = () => {
   const navigation = useNavigation();
   const slidesRef = useRef(null);
 
+  // remind me number 2 
   const requestPermissions = async () => {
     try {
       // Request camera and photo library permissions
@@ -134,7 +134,8 @@ const OnboardingScreen = () => {
       </View>
 
       <View className="mb-8 px-4">
-        <TouchableOpacity className="rounded-full bg-colorBlue py-4" onPress={requestPermissions}>
+        {/* <TouchableOpacity className="rounded-full bg-colorBlue py-4" onPress={requestPermissions}> */}
+        <TouchableOpacity className="rounded-full bg-colorBlue py-4" onPress={navigation.navigate('Auth')}>
           <Text className="text-center text-lg font-semibold text-white">Get Started</Text>
         </TouchableOpacity>
       </View>

@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
 
 const DUMMY_BLOCKED_USERS = [

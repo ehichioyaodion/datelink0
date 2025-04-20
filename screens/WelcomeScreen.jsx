@@ -1,7 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { View, Text, Image, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
 import { useAuth } from '../context/AuthContext';
 
 const WelcomeScreen = () => {
@@ -15,7 +16,7 @@ const WelcomeScreen = () => {
     const checkAuthAndNavigate = async () => {
       try {
         console.log('Starting auth check...'); // Debug log
-        
+
         // Add timeout handling
         const loginPromise = attemptAutoLogin();
         const timeoutPromise = new Promise((_, reject) =>
@@ -23,8 +24,8 @@ const WelcomeScreen = () => {
         );
 
         // Wait for animation
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
         // Race between login attempt and timeout
         const isAutoLoginSuccessful = await Promise.race([loginPromise, timeoutPromise]);
         console.log('Auth check result:', isAutoLoginSuccessful); // Debug log
@@ -58,15 +59,15 @@ const WelcomeScreen = () => {
   }));
 
   return (
-    <View className="flex-1 items-center justify-center bg-primary">
+    <View className="flex-1 items-center justify-center bg-blue-500">
       <Animated.View style={animatedStyle}>
         <View className="items-center">
-          <Image 
-            source={require('../assets/icon.png')} 
-            className="h-32 w-32" 
+          <Image
+            source={require('../assets/icon.png')}
+            className="h-32 w-32"
             resizeMode="contain"
           />
-          <Text className="mt-4 text-3xl font-bold text-white">DateLink</Text>
+          <Text className="mt-4 text-3xl font-bold text-white">DATELINK</Text>
           <ActivityIndicator size="large" color="#ffffff" className="mt-4" />
         </View>
       </Animated.View>

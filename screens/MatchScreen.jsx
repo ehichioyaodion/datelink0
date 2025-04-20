@@ -1,12 +1,11 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { HeartIcon } from 'react-native-heroicons/solid';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const MatchScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
 
   return (
     <View className="flex-1 bg-colorBlue">

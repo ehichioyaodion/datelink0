@@ -1,3 +1,4 @@
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   View,
@@ -12,8 +13,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
+
 import { useAuth } from '../context/AuthContext';
 // Import useNotification instead of useToast
 import { useNotification } from '../hooks/useNotification';
@@ -47,8 +48,9 @@ const LoginScreen = () => {
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const trimmedEmail = email.replace(/\s/g, '');
+    if (!emailRegex.test(trimmedEmail)) {
       showError('Please enter a valid email address');
       return false;
     }
@@ -111,16 +113,11 @@ const LoginScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
-    >
+      className="flex-1 bg-white">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView 
-          className="flex-1"
-          bounces={false}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView className="flex-1" bounces={false} showsVerticalScrollIndicator={false}>
           <View className="p-4">
             <TouchableOpacity
               onPress={() => navigation.popToTop()}
@@ -140,11 +137,12 @@ const LoginScreen = () => {
                   className="rounded-xl bg-gray-100 p-4 text-gray-900"
                   placeholder="Enter your email"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(text) => setEmail(text.trim())}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
                   textContentType="emailAddress"
+                  spellCheck={false}
                 />
               </View>
 
@@ -193,3 +191,5 @@ const LoginScreen = () => {
 };
 
 export default LoginScreen;
+
+

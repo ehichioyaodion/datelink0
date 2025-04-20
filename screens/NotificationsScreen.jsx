@@ -1,8 +1,9 @@
+import { useNavigation } from '@react-navigation/native';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+
 import { FIREBASE_DB } from '../FirebaseConfig';
 import { useAuth } from '../context/AuthContext';
 
@@ -56,11 +57,11 @@ const NotificationsScreen = () => {
     );
 
     const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
-      const notificationsData = snapshot.docs.map(doc => ({
+      const notificationsData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      
+
       setNotifications(notificationsData);
       setLoading(false);
     });

@@ -1,24 +1,24 @@
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
 // Fix useAuth import
-import { useAuth } from '../context/AuthContext';
 import { View, ActivityIndicator } from 'react-native';
-import TabNavigator from './TabNavigator';
 
+import TabNavigator from './TabNavigator';
+import { useAuth } from '../context/AuthContext';
 // Import screens
-import WelcomeScreen from '../screens/WelcomeScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
 import AuthScreen from '../screens/AuthScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ProfileSetupScreen from '../screens/ProfileSetupScreen';
-import ChatRoomScreen from '../screens/ChatRoomScreen';
-import MatchScreen from '../screens/MatchScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import NotificationsScreen from '../screens/NotificationsScreen';
-import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
 import BlockedUsersScreen from '../screens/BlockedUsersScreen';
+import ChatRoomScreen from '../screens/ChatRoomScreen';
+import LoginScreen from '../screens/LoginScreen';
+import MatchScreen from '../screens/MatchScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
+import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
+import ProfileSetupScreen from '../screens/ProfileSetupScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import WelcomeScreen from '../screens/WelcomeScreen';
 
 const Stack = createNativeStackNavigator();
 

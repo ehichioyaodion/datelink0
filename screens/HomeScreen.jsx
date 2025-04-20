@@ -1,20 +1,40 @@
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+  doc,
+  updateDoc,
+  arrayUnion,
+  getDoc,
+  setDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+} from 'firebase/firestore';
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, Modal, ActivityIndicator } from 'react-native';
-import { HeartIcon, CheckBadgeIcon, XMarkIcon, StarIcon, ArrowLeftIcon, AdjustmentsVerticalIcon } from 'react-native-heroicons/solid';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  HeartIcon,
+  CheckBadgeIcon,
+  XMarkIcon,
+  StarIcon,
+  ArrowLeftIcon,
+  AdjustmentsVerticalIcon,
+} from 'react-native-heroicons/solid';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNotification } from '../hooks/useNotification';
-import { useAuth } from '../context/AuthContext';
+
 import { FIREBASE_DB, USERS_REF, PROFILES_REF, SUPER_LIKES_REF } from '../FirebaseConfig';
-import { doc, updateDoc, arrayUnion, getDoc, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { width, height, SUPER_LIKES_DAILY_LIMIT } from '../constants/dimensions';
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../hooks/useNotification';
+
 const SWIPE_THRESHOLD = width * 0.3;
 
 const HomeScreen = () => {
@@ -41,19 +61,18 @@ const HomeScreen = () => {
   const handleApplyFilters = (newFilters) => {
     setActiveFilters(newFilters);
     setIsFilterVisible(false);
-    
+
     // Filter the profiles based on the new filters
-    const filteredProfiles = profiles.filter(profile => {
+    const filteredProfiles = profiles.filter((profile) => {
       const meetsDistanceCriteria = profile.distance <= newFilters.distance;
-      const meetsAgeCriteria = 
-        profile.age >= newFilters.ageRange[0] && 
-        profile.age <= newFilters.ageRange[1];
-      
+      const meetsAgeCriteria =
+        profile.age >= newFilters.ageRange[0] && profile.age <= newFilters.ageRange[1];
+
       // Add more filtering logic based on your needs
-      
+
       return meetsDistanceCriteria && meetsAgeCriteria;
     });
-    
+
     // Update your profiles state or handling logic here
     // For now, just log the filtered profiles
     console.log('Filtered profiles:', filteredProfiles);
@@ -120,7 +139,7 @@ const HomeScreen = () => {
       setLoading(true);
       const userDoc = await getDoc(doc(FIREBASE_DB, USERS_REF, user.uid));
       const userData = userDoc.data();
-      
+
       // Build query based on user preferences and filters
       let profilesQuery = query(
         collection(FIREBASE_DB, PROFILES_REF),
@@ -130,10 +149,7 @@ const HomeScreen = () => {
 
       // Add filter conditions
       if (activeFilters.interestedIn !== 'both') {
-        profilesQuery = query(
-          profilesQuery,
-          where('gender', '==', activeFilters.interestedIn)
-        );
+        profilesQuery = query(profilesQuery, where('gender', '==', activeFilters.interestedIn));
       }
 
       if (activeFilters.ageRange) {
@@ -180,18 +196,18 @@ const HomeScreen = () => {
   // Calculate distance between two coordinates
   const calculateDistance = (coords1, coords2) => {
     if (!coords1 || !coords2) return 999; // Return large number if coordinates not available
-    
-    const R = 6371; // Earth's radius in km
-    const lat1 = coords1.latitude * Math.PI / 180;
-    const lat2 = coords2.latitude * Math.PI / 180;
-    const dLat = (coords2.latitude - coords1.latitude) * Math.PI / 180;
-    const dLon = (coords2.longitude - coords1.longitude) * Math.PI / 180;
 
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const R = 6371; // Earth's radius in km
+    const lat1 = (coords1.latitude * Math.PI) / 180;
+    const lat2 = (coords2.latitude * Math.PI) / 180;
+    const dLat = ((coords2.latitude - coords1.latitude) * Math.PI) / 180;
+    const dLon = ((coords2.longitude - coords1.longitude) * Math.PI) / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
@@ -282,7 +298,14 @@ const HomeScreen = () => {
       console.error('Super Like error:', error);
       showError('Failed to Super Like. Please try again.');
     }
-  }, [currentIndex, superLikesRemaining, checkAndResetSuperLikes, user.uid, showSuccess, showError]);
+  }, [
+    currentIndex,
+    superLikesRemaining,
+    checkAndResetSuperLikes,
+    user.uid,
+    showSuccess,
+    showError,
+  ]);
 
   // Show loading state
   if (loading) {
@@ -297,14 +320,13 @@ const HomeScreen = () => {
   if (profiles.length === 0) {
     return (
       <View className="flex-1 items-center justify-center p-4">
-        <Text className="text-xl text-gray-600 text-center">
+        <Text className="text-center text-xl text-gray-600">
           No profiles found matching your criteria
         </Text>
         <TouchableOpacity
           onPress={fetchProfiles}
-          className="mt-4 bg-colorBlue px-6 py-3 rounded-full"
-        >
-          <Text className="text-white font-semibold">Refresh</Text>
+          className="mt-4 rounded-full bg-colorBlue px-6 py-3">
+          <Text className="font-semibold text-white">Refresh</Text>
         </TouchableOpacity>
       </View>
     );
@@ -316,9 +338,8 @@ const HomeScreen = () => {
         <Text className="text-xl text-gray-600">No more profiles to show</Text>
         <TouchableOpacity
           onPress={fetchProfiles}
-          className="mt-4 bg-colorBlue px-6 py-3 rounded-full"
-        >
-          <Text className="text-white font-semibold">Find More</Text>
+          className="mt-4 rounded-full bg-colorBlue px-6 py-3">
+          <Text className="font-semibold text-white">Find More</Text>
         </TouchableOpacity>
       </View>
     );
@@ -330,8 +351,7 @@ const HomeScreen = () => {
     <View className="flex-1">
       <View className="flex-row items-center justify-between p-4">
         <Text className="text-2xl font-bold text-gray-900">Discover</Text>
-        <TouchableOpacity
-          className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+        <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
           <AdjustmentsVerticalIcon size={20} color="#374151" />
         </TouchableOpacity>
       </View>
@@ -340,14 +360,14 @@ const HomeScreen = () => {
         <GestureDetector gesture={gesture}>
           <Animated.View
             style={[rStyle]}
-            className="absolute md:w-[400px] w-[90%] h-[75%] rounded-3xl bg-white shadow-xl">
+            className="absolute h-[75%] w-[90%] rounded-3xl bg-white shadow-xl md:w-[400px]">
             <View className="relative h-full w-full overflow-hidden rounded-3xl">
-              <Image 
-                source={{ uri: profile.image }} 
-                className="absolute h-full w-full" 
-                resizeMode="cover" 
+              <Image
+                source={{ uri: profile.image }}
+                className="absolute h-full w-full"
+                resizeMode="cover"
               />
-              
+
               {/* Distance Indicator */}
               <View className="absolute left-4 top-4 rounded-full bg-white/20 px-4 py-1.5">
                 <Text className="text-base font-semibold text-white">
@@ -412,5 +432,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
-

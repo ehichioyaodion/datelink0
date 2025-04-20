@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import {
   ArrowLeftIcon,
   LockClosedIcon,

@@ -18,6 +18,6 @@ export const useNotification = () => {
   return {
     showSuccess,
     showError,
-    showWarning
+    showWarning,
   };
 };

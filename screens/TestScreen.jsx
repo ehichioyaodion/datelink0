@@ -12,10 +12,7 @@ const TestScreen = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Animated.View
-        style={[
-          { width: 100, height: 100, backgroundColor: 'blue' },
-          animatedStyle,
-        ]}
+        style={[{ width: 100, height: 100, backgroundColor: 'blue' }, animatedStyle]}
       />
     </View>
   );

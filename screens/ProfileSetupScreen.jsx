@@ -1,3 +1,8 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import React, { useState } from 'react';
 import {
   View,
@@ -10,14 +15,10 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon, CameraIcon } from 'react-native-heroicons/solid';
-import { useAuth } from '../context/AuthContext';
-import * as ImagePicker from 'expo-image-picker';
-import { doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 import { FIREBASE_DB, FIREBASE_STORAGE } from '../FirebaseConfig';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { useAuth } from '../context/AuthContext';
 
 const ProfileSetupScreen = () => {
   const navigation = useNavigation();
@@ -146,12 +147,7 @@ const ProfileSetupScreen = () => {
     }
 
     const age = calculateAge(dateOfBirth);
-    if (age < 18) {
-      Alert.alert('Error', 'You must be at least 18 years old to use this app');
-      return false;
-    }
-
-    if (age > 100) {
+    if (age < 18 || age > 40) {
       Alert.alert('Error', 'Please enter a valid date of birth');
       return false;
     }
@@ -229,6 +225,14 @@ const ProfileSetupScreen = () => {
   };
 
   const renderDatePicker = () => {
+    // Calculate minimum and maximum dates based on age limits
+    const today = new Date();
+    const minAge = 18;
+    const maxAge = 40;
+    
+    const maxDate = new Date(today.getFullYear() - minAge, today.getMonth(), today.getDate());
+    const minDate = new Date(today.getFullYear() - maxAge, today.getMonth(), today.getDate());
+
     if (Platform.OS === 'ios') {
       return (
         <View>
@@ -238,12 +242,11 @@ const ProfileSetupScreen = () => {
             mode="date"
             display="spinner"
             onChange={onDateChange}
-            maximumDate={new Date()}
-            minimumDate={new Date(1923, 0, 1)}
+            maximumDate={maxDate}
+            minimumDate={minDate}
           />
-          <Text className="mt-1 text-right text-gray-500">
-            Age: {calculateAge(dateOfBirth)}
-          </Text>
+          <Text className="mt-1 text-right text-gray-500">Age: {calculateAge(dateOfBirth)}</Text>
+          <Text className="mt-1 text-xs text-gray-400">Age must be between 18 and 40 years</Text>
         </View>
       );
     }
@@ -251,9 +254,7 @@ const ProfileSetupScreen = () => {
     return (
       <View>
         <Text className="mb-2 text-base text-gray-700">Date of Birth</Text>
-        <TouchableOpacity
-          onPress={showDatePickerModal}
-          className="rounded-xl bg-gray-100 p-4">
+        <TouchableOpacity onPress={showDatePickerModal} className="rounded-xl bg-gray-100 p-4">
           <Text className="text-gray-900">
             {dateOfBirth.toLocaleDateString()} (Age: {calculateAge(dateOfBirth)})
           </Text>
@@ -264,10 +265,11 @@ const ProfileSetupScreen = () => {
             mode="date"
             display="default"
             onChange={onDateChange}
-            maximumDate={new Date()}
-            minimumDate={new Date(1923, 0, 1)}
+            maximumDate={maxDate}
+            minimumDate={minDate}
           />
         )}
+        <Text className="mt-1 text-xs text-gray-400">Age must be between 18 and 40 years</Text>
       </View>
     );
   };
@@ -388,3 +390,4 @@ const ProfileSetupScreen = () => {
 };
 
 export default ProfileSetupScreen;
+

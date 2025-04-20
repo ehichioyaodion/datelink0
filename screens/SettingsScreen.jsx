@@ -1,8 +1,8 @@
+import Slider from '@react-native-community/slider';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Switch } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
-import Slider from '@react-native-community/slider';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();

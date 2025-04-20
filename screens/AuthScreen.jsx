@@ -1,9 +1,30 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../hooks/useNotification';
 
 const AuthScreen = () => {
   const navigation = useNavigation();
+  const { signInWithGoogle } = useAuth();
+  const { showSuccess, showError } = useNotification();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const user = await signInWithGoogle();
+      if (user) {
+        showSuccess('Successfully signed in with Google!');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: user.profileCompleted ? 'TabNavigator' : 'ProfileSetup' }],
+        });
+      }
+    } catch (error) {
+      showError('Failed to sign in with Google');
+      console.error('Google sign in error:', error);
+    }
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -26,7 +47,21 @@ const AuthScreen = () => {
         <TouchableOpacity
           className="my-2 rounded-full bg-colorBlue py-4"
           onPress={() => navigation.navigate('Login')}>
-          <Text className="text-center text-lg font-semibold text-white">Log In</Text>
+          <Text className="text-center text-lg font-semibold text-white">Log In with Email</Text>
+        </TouchableOpacity>
+
+        {/* Google Sign In Button */}
+        <TouchableOpacity
+          className="my-2 flex-row items-center justify-center rounded-full border border-gray-300 bg-white py-4"
+          onPress={handleGoogleSignIn}>
+          <Image
+            source={require('../assets/google-logo.png')}
+            className="mr-2 h-5 w-5"
+            resizeMode="contain"
+          />
+          <Text className="text-center text-lg font-semibold text-gray-700">
+            Continue with Google
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
